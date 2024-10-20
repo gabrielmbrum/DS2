@@ -3,37 +3,25 @@
 #include <string.h>
 #include <stdbool.h>
 #include "veiculo.h"
+#include "btree.h"
 
-char *namingfile() {
-  int n;
-  char *filename, *aux_filename;
-  filename = (char*)malloc(sizeof(char) * 50); //13 is the maximum that the name can be 
-  aux_filename = (char*)malloc(sizeof(char) * 4);
-  
-  printf("M?\n");
-  scanf("%d", &n);
-  
-  if (filename == NULL || aux_filename == NULL) {
-    perror("not enought memory\n");
-    return 0;return
-  }
+//the filename it will be determinated by M at "btree.h"
+void build_name (char **name) {
+  char *aux;
+  *name = (char*)malloc(sizeof(char) * 14); //the biggest name would be btree_100.idx (13 chars + \0) = 14 
+  aux = malloc(sizeof(char) * 4); //it will receive the numeric order (max it's 100)
 
-  sprintf(aux_filename, "%d", n);
-     
-  strcpy(filename, "btree_");
-  
-  strcat( filename, aux_filename);
-  
-  strcat(filename, ".idx");
+  sprintf(aux, "%d", M);
+  strcpy(*name, "btree_");
+  strcat(*name, aux);
+  strcat(*name, ".idx");
 
-  free(aux_filename);
-  return filename;
+  free(aux);
 }
 
+//@return true if exist a file with the name passed
 bool fileexist(char *filename) {
-  FILE *f;
-  f = fopen(filename, "r");
-  return !(f == NULL);
+  return !(fopen(filename, "r") == NULL);
 }
 
 int main () {
@@ -42,27 +30,20 @@ int main () {
   Veiculo a, b;
   size_t tamanho_registro = sizeof(Veiculo);
 
-  filename = (char*)malloc(sizeof(char) * 15); //13 is the maximum that the name can be 
-  filename = namingfile();
+  build_name(&filename);
 
   datFile = fopen("veiculos.dat", "r");
   if (datFile == NULL) {
-    perror("failed to open veiculos.dat\n");
+    printf("failed to open veiculos.dat\n");
     return 0;
   }
 
   if (fileexist(filename)) {
-    // printf("already exist this file\n");
-    btreeIdx = fopen(filename, "w+");
-
-    size_t registro_lido = fread(&a, tamanho_registro, 1, datFile);
-    imprimeVeiculo(a);
-    
-    fwrite(a, tamanho_registro, 1, btreeIdx); 
+    // load the root and show interface
   }
   else { 
-    printf("doesnt exist this file\nit will be necessary to read all infos and create a btree with new order\n" );
-    
+    // create file from datfile, inserting pkey on btree; using the queue and saving on btree_M.idx
+    // load root and show interface  
   }   
 
   return 0;
