@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "veiculo.h"
+#include "vehicle.h"
 #include "btree.h"
 
 //the filename it will be determinated by M at "btree.h"
@@ -27,12 +27,12 @@ bool fileexist(char *filename) {
 int main () {
   FILE *btreeIdx, *datFile;
   char *filename;
-  Veiculo a, b;
-  size_t tamanho_registro = sizeof(Veiculo);
+  Vehicle a, b;
+  size_t tamanho_registro = sizeof(Vehicle);
 
   build_name(&filename);
 
-  datFile = fopen("veiculos.dat", "r");
+  datFile = fopen("veiculos.dat", "rb"); //mode rb is for read binary files
   if (datFile == NULL) {
     printf("failed to open veiculos.dat\n");
     return 0;
@@ -43,6 +43,8 @@ int main () {
   }
   else { 
     // create file from datfile, inserting pkey on btree; using the queue and saving on btree_M.idx
+    btreeIdx = fopen(filename, "w+");
+
     // load root and show interface  
   }   
 
