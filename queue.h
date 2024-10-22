@@ -18,3 +18,7 @@ typedef struct queue {
 } Queue;
 
 void initializeQueue(Queue *queue);
+
+void enqueue(Queue* queue, BTreeNode* node, bool modified);
+
+void dequeue(Queue* queue);
