@@ -17,3 +17,5 @@ typedef struct {
 } Vehicle;
 
 void printVehicle (Vehicle v);
+
+const size_t tamanho_registro = sizeof(Vehicle);
