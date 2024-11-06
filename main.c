@@ -1,52 +1,60 @@
+#include "vbtree.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "vehicle.h"
-#include "btree.h"
 
-//the filename it will be determinated by M at "btree.h"
-void build_name (char **name) {
-  char *aux;
-  *name = (char*)malloc(sizeof(char) * 14); //the biggest name would be btree_100.idx (13 chars + \0) = 14 
-  aux = malloc(sizeof(char) * 4); //it will receive the numeric order (max it's 100)
-
-  sprintf(aux, "%d", M);
-  strcpy(*name, "btree_");
-  strcat(*name, aux);
-  strcat(*name, ".idx");
-
-  free(aux);
-}
-
-//@return true if exist a file with the name passed
-bool fileexist(char *filename) {
-  return !(fopen(filename, "r") == NULL);
-}
-
-int main () {
-  FILE *btreeIdx, *datFile;
+int main() {
   char *filename;
-  Vehicle a, b;
-  size_t tamanho_registro = sizeof(Vehicle);
+  BTreeNode *root = (BTreeNode*) malloc(sizeof(BTreeNode));
+  Queue *queue = (Queue*) malloc(sizeof(Queue));
 
   build_name(&filename);
-
-  datFile = fopen("veiculos.dat", "rb"); //mode rb is for read binary files
-  if (datFile == NULL) {
-    printf("failed to open veiculos.dat\n");
-    return 0;
-  }
-
+  initializeQueue(&queue);
+  
+  // Carrega o B-tree se o arquivo já existir
   if (fileexist(filename)) {
-    // load the root and show interface
+    root = readRootRRNFromFile(filename, queue);
+    printf("Arquivo %s carregado com sucesso.\n", filename);
+  } else {
+    // Cria o arquivo a partir de "vehicles.dat"
+    root = buildBtreeFile(filename);
+    printf("Arquivo %s criado com sucesso a partir do datafile.\n", filename);
   }
-  else { 
-    // create file from datfile, inserting pkey on btree; using the queue and saving on btree_M.idx
-    btreeIdx = fopen(filename, "w+");
 
-    // load root and show interface  
-  }   
+  int option;
+  do {
+    printf("\n=== Menu de Opções ===\n");
+    printf("1. Buscar veículo pela placa\n");
+    printf("2. Inserir veículo (não implementado)\n");
+    printf("3. Remover veículo (não implementado)\n");
+    printf("4. Sair\n");
+    printf("Escolha uma opção: ");
+    scanf("%d", &option);
 
+    switch (option) {
+      case 1:
+        searchInBTree(root, queue);
+        break;
+
+      case 2:
+        printf("Ops! A funcionalidade de inserção ainda está em desenvolvimento. Aguarde as próximas atualizações!\n");
+        break;
+
+      case 3:
+        printf("Parece que remover veículos ainda não é possível. Fique ligado para futuras implementações!\n");
+        break;
+
+      case 4:
+        printf("Saindo do programa. Até logo!\n");
+        break;
+
+      default:
+        printf("Opção inválida. Tente novamente.\n");
+    }
+  } while (option != 4);
+
+  free(root);
+  free(queue);
+  free(filename);
+  
   return 0;
 }

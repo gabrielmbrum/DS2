@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define M 5
+#define M 4
 #define P 10
 #define LICENSE_PLATE_SIZE 8
 #define MODEL_SIZE 20
@@ -11,46 +11,14 @@
 #define CATEGORY_SIZE 15
 #define STATUS_SIZE 16
 
-/*                                  old 'btree.h'                                 */
-
 typedef struct {
   char keys[M - 1][LICENSE_PLATE_SIZE];    // Vehicle license plates (keys)
-  int keys_rrn[M - 1];                         // RNNs of the vehicles in the data file
-  int children[M];                         // RNNs of the child nodes
+  int keys_rrn[M - 1];                         // RRNs of the vehicles in the data file
+  int children[M];                         // RRNs of the child nodes
   int numKeys;                             // Number of keys in the page
   bool isLeaf;                             // Indicates if the node is a leaf
   int rrn;                                 // RRN of the node itself
 } BTreeNode;
-
-BTreeNode *createNode(bool is_leaf);
-
-BTreeNode* buildBtreeFile (char *filename);
-
-void split(BTreeNode *parent, int index);
-
-void insertNonFull(BTreeNode *node, const char *key, int rrn);
-
-void insert(BTreeNode **root, const char *key, int rrn);
-
-BTreeNode* readNodeByRNNFromFile (int page_rrn);
-
-/*                                  old 'vehicle.h'                                 */
-
-typedef struct {
-  char licensePlate[LICENSE_PLATE_SIZE];    
-  char model[MODEL_SIZE];                   
-  char brand[BRAND_SIZE];                   
-  int year;                                 
-  char category[CATEGORY_SIZE];             
-  int km;                              
-  char status[STATUS_SIZE];                 
-} Vehicle;
-
-void printVehicle (Vehicle v);
-
-const size_t tamanho_registro_veiculo = sizeof(Vehicle);
-
-/*                                  old 'queue.h'                                 */
 
 typedef struct queueNode {
   BTreeNode *node;
@@ -64,22 +32,60 @@ typedef struct queue {
   int size;
 } Queue;
 
-void initializeQueue(Queue *queue);
+typedef struct {
+  char licensePlate[LICENSE_PLATE_SIZE];    
+  char model[MODEL_SIZE];                   
+  char brand[BRAND_SIZE];                   
+  int year;                                 
+  char category[CATEGORY_SIZE];             
+  int km;                              
+  char status[STATUS_SIZE];                 
+} Vehicle;
 
-void enqueue(Queue* queue, BTreeNode* node, bool modified);
+BTreeNode *createNode(bool is_leaf);
 
-void dequeue(Queue* queue);
+BTreeNode* buildBtreeFile (char *filename);
 
-void moveToLast(Queue *queue, BTreeNode* node);
+void split(BTreeNode** parent, int index, BTreeNode* child, Queue** queue);
+
+void insertNonFull(BTreeNode** node, const char *key, int vehicle_rrn, Queue** queue);
+
+void insert(BTreeNode **root, const char *key, int vehicle_rrn, Queue** queue, const char *filename);
+
+BTreeNode* readNodeByRRNFromFile (int page_rrn);
+
+BTreeNode* readRootRRNFromFile(const char *filename, Queue *queue);
+
+void printVehicle (Vehicle v);
+
+void initializeQueue(Queue **queue);
+
+void enqueue(Queue** queue, BTreeNode* node, bool modified);
+
+void dequeue(Queue** queue);
+
+void moveToLast(Queue** queue, BTreeNode* node);
+
+void writeAllModified(Queue* queue);
+
+bool contains(Queue* queue, int rrn);
 
 BTreeNode* getNode (Queue *queue, int rrn);
 
-BTreeNode* searchOnQueue (Queue *queue, int rnn);
-
-/*                                  old 'file.h'                                 */
+BTreeNode* searchOnQueue (Queue *queue, int rrn);
 
 void build_name (char **name);
 
 bool fileexist(char *filename);
 
 void writeNodeToFile (BTreeNode *node);
+
+void printNode(BTreeNode* node);
+
+Vehicle readVehicleByRRN(int rrn);
+
+void printVehicleInfo(BTreeNode *node, const char *licensePlate);
+
+BTreeNode* searchNode(BTreeNode *root, const char *licensePlate, Queue *queue);
+
+void searchInBTree(BTreeNode *root, Queue *queue);
